@@ -19,7 +19,8 @@ class Client(object):
 
     def __init__(self, url=None, token=None,
                  cert=None, verify=True, timeout=30, proxies=None,
-                 allow_redirects=True, session=None, adapter=adapters.Request, namespace=None):
+                 allow_redirects=True, session=None, adapter=adapters.Request,
+                 namespace=None, get_token_from_env=True):
         """Creates a new hvac client instance.
 
         :param url: Base URL for the Vault instance being addressed.
@@ -46,9 +47,13 @@ class Client(object):
         :type adapter: hvac.adapters.Adapter
         :param namespace: Optional Vault Namespace.
         :type namespace: str
+        :type get_token_from_env: bool
+        :param get_token_from_env: Optional boolean indicating if a token should be fetched from the environment or not; defaults to True
         """
 
-        token = token if token is not None else utils.get_token_from_env()
+        if token is None and get_token_from_env:
+            token = utils.get_token_from_env()
+
         url = url if url else os.getenv('VAULT_ADDR', DEFAULT_URL)
         self._adapter = adapter(
             base_uri=url,
